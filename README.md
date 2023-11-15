@@ -10,7 +10,7 @@
 ```bash
 npm ci # install dependencies
 ```
-- Next run the command below to create an SQL migration file and run the migration file against the database.
+- Next run the command below to generate the db client, create an SQL migration file, and run the migration file against the database.
 ```bash
 npx prisma migrate dev --name init
 ```
