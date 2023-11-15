@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id      Int      @id @default(autoincrement())
+  email   String   @unique
+  username    String @unique
+  password String
+  is_blocked Boolean @default(false)
+  resource_locked Boolean @default(false)
+  account_balance Int @default(0)
+  transactions Transaction[]
+  created_at DateTime @default(now())
+  updated_at DateTime? @updatedAt
+}
+
+enum TransactionStatus {
+  initialized
+  cancelled
+  success
+}
+
+enum TransactionType {
+  transfer
+  withdraw
+  deposit
+}
+
+model Transfer {
+  id Int @id @default(autoincrement())
+  transaction_id Int @unique
+  transaction Transaction @relation(fields: [transaction_id], references: [id])
+  receipient_id Int
+}
+
+model Withdraw {
+  id Int @id @default(autoincrement())
+  transaction_id Int @unique
+  transaction Transaction @relation(fields: [transaction_id], references: [id])
+  destination_bank String
+  destination_account_number String
+}
+
+model Deposit {
+  id Int @id @default(autoincrement())
+  transaction_id Int @unique
+  transaction Transaction @relation(fields: [transaction_id], references: [id])
+  method String
+}
+
+model Transaction {
+  id      Int      @id @default(autoincrement())
+  amount Int
+  user_id Int
+  user User @relation(fields: [user_id], references: [id])
+  type TransactionType
+  status TransactionStatus
+  transfer Transfer?
+  withdraw Withdraw?
+  deposit Deposit?
+  created_at DateTime @default(now())
+  updated_at DateTime? @updatedAt
+}
